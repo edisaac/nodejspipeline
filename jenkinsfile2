@@ -18,11 +18,11 @@ pipeline {
         
         stage('test') {
             agent {
-                label 'agent1'
+                label 'agentdocker'
             }
             steps {
               script {
-                def contenedortest = docker.image('node:4.6')
+                def contenedortest = docker.image('node:12.12.0-alpine')
                 contenedortest.pull()
                 contenedortest.inside {
                   sh 'npm install --only=dev'
