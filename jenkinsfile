@@ -36,13 +36,12 @@ pipeline {
                 label 'agentdocker'
             }
             steps {
-                 script
-                {
+              script{
                 docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credential') {
                     def nuestraapp = docker.build("edisaac/nodejsapp:${gitcommit}", ".")
                     nuestraapp.push()
                 }
-                }
+              }
             }
         }
     }
