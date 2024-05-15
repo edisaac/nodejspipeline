@@ -1,17 +1,17 @@
 pipeline {
     agent none
-    
     stages {
         stage('Verificación SCM') {
             agent {
-                label any
+                label 'agent1'
             }
             steps {
-              script {
                 checkout scm
-                sh "git rev-parse --short HEAD > .git/commit-id"                        
-                gitcommit = readFile('.git/commit-id').trim()
-              }
+                sh "git rev-parse --short HEAD > .git/commit-id"
+                script {
+                  def gitcommit
+                  gitcommit = readFile('.git/commit-id').trim()
+                }
             }
         }
         
@@ -21,6 +21,7 @@ pipeline {
             }
             steps {
               script {
+                    
                 nodejs(nodeJSInstallationName: 'nodejs22') {
                     sh 'npm install --only=dev'
                     sh 'npm test'
@@ -34,12 +35,13 @@ pipeline {
                 label 'agentdocker'
             }
             steps {
-              script {
+                 script
+                {
                 docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credential') {
                     def nuestraapp = docker.build("edisaac/nodejsapp:${gitcommit}", ".")
                     nuestraapp.push()
                 }
-              }
+                }
             }
         }
     }
