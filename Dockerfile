@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:12.12.0-alpine
 WORKDIR /appnodejs
 ADD . /appnodejs
 RUN npm install
