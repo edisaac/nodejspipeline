@@ -1,0 +1,48 @@
+def gitcommit
+
+pipeline {
+    agent none
+    stages {
+        stage('Verificación SCM') {
+            agent {
+                label 'agent1'
+            }
+            steps {
+                checkout scm
+                sh "git rev-parse --short HEAD > .git/commit-id"
+                script {
+                  gitcommit = readFile('.git/commit-id').trim()
+                }
+            }
+        }
+        
+        stage('test') {
+            agent {
+                label 'agentdocker'
+            }
+            steps {
+              script {
+                    
+                nodejs(nodeJSInstallationName: 'nodejs22') {
+                    sh 'npm install --only=dev'
+                    sh 'npm test'
+                }
+              }
+            }
+        }
+        
+        stage('Docker Build & Push') {
+            agent {
+                label 'agentdocker'
+            }
+            steps {
+              script{
+                docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credential') {
+                    def nuestraapp = docker.build("edisaac/nodejsapp:${gitcommit}", ".")
+                    nuestraapp.push()
+                }
+              }
+            }
+        }
+    }
+}
