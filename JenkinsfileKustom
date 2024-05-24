@@ -15,7 +15,7 @@ pipeline {
     
     stages {
         stage('Build') {           
-            when { branch pattern: "(.*)SNAPSHOT|(.*)RELEASE|master", comparator: "REGEXP"}
+            when { branch pattern: "develop|release|main", comparator: "REGEXP"}
             steps {
                 script {
                     GIT_COMMIT_REV = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()                     
@@ -23,21 +23,21 @@ pipeline {
                     imageName =  registryPath + "/" + appName + ":" + "$BRANCH_NAME-" + GIT_COMMIT_REV
                     imagePath =   imageName
                     docker.withRegistry( "https://"+ registryHost, registryCredential ) {
-                        dockerImage = docker.build  imageName    
+                        dockerImage = docker.build  imageName                      
                     }
                     echo "BUILD"
                 }
             }
         }
         stage('Push') {      
-            when { branch pattern: "(.*)SNAPSHOT|(.*)RELEASE|master", comparator: "REGEXP"}     
+            when { branch pattern: "develop|release|main", comparator: "REGEXP"}     
             steps {
                 
                 script {
                     
                      docker.withRegistry( 'https://' + registryHost, registryCredential ) {
                         dockerImage.push()
-                        if ("master".equals(env.BRANCH_NAME)){
+                        if ("main".equals(env.BRANCH_NAME)){
                            dockerImage.push("latest")
                         }
                     }
@@ -46,7 +46,7 @@ pipeline {
             }
         }
         stage('Deploy to DEV') {
-            when { branch pattern: "(.*)SNAPSHOT", comparator: "REGEXP"}
+            when { branch pattern: "develop", comparator: "REGEXP"}
             steps {
                 script {
                     git branch: "SNAPSHOT", credentialsId: sshCredentials,url: kubernetesGitOpsUrl
@@ -61,7 +61,7 @@ pipeline {
             }
         }
         stage('Deploy to QA') {
-            when { branch pattern: "(.*)RELEASE", comparator: "REGEXP"}
+            when { branch pattern: "release", comparator: "REGEXP"}
             steps {
                 script {
                     git branch: "RELEASE", credentialsId: sshCredentials,url: kubernetesGitOpsUrl
