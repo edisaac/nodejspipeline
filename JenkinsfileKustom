@@ -53,7 +53,8 @@ pipeline {
                     sh "(cd dev/apps/${appName} && kustomize edit set image ${imagePath})"
                     sh "git add -A"
                     sh "git commit -m 'modificado por jenkins job  ${env.BUILD_URL}'"
-                    sshagent([sshCredentials])
+
+                    sshagent(credentials:[sshCredentials])
                         {
                             sh "git push --set-upstream origin SNAPSHOT" 
                         }
