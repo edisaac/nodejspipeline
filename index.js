@@ -12,11 +12,11 @@ app.get('/', function (req, res) {
   // Crear un string con las variables de entorno
   var envVariables = `
     KEYCLOAK_URL>>>>: ${keycloakUrl}<<<<
-    
+    </br>
     KEYCLOAK_REALM: ${keycloakRealm}
-  
+    </br>
     KEYCLOAK_CLIENT_ID: ${keycloakClientId}
-    
+    </br>
     API_URL: ${apiUrl}
   `;
 
