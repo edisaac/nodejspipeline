@@ -18,6 +18,8 @@ app.get('/', function (req, res) {
     KEYCLOAK_CLIENT_ID: ${keycloakClientId}
     </br>
     API_URL: ${apiUrl}
+    </br>
+    SUPERCAMBIO >>>>>>>>
   `;
 
   // Enviar las variables de entorno como respuesta
